@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Locadora de Veículos</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f0f;
+    --surface: #181818;
+    --surface2: #222222;
+    --border: #2e2e2e;
+    --accent: #e8c547;
+    --accent2: #d4a82b;
+    --text: #f0f0f0;
+    --muted: #888;
+    --danger: #e05555;
+    --success: #4caf7d;
+    --radius: 10px;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+  header .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.5px;
+    color: var(--accent);
+  }
+  header .logo span { color: var(--text); }
+  header .badge {
+    font-size: 11px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  /* LAYOUT */
+  .app { display: flex; flex: 1; }
+
+  /* SIDEBAR */
+  nav {
+    width: 220px;
+    min-height: calc(100vh - 64px);
+    border-right: 1px solid var(--border);
+    padding: 20px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  nav .section-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    padding: 8px 12px 4px;
+    font-weight: 600;
+  }
+  nav button {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    color: var(--muted);
+    padding: 9px 12px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.15s;
+    font-weight: 400;
+  }
+  nav button:hover { background: var(--surface2); color: var(--text); }
+  nav button.active { background: var(--surface2); color: var(--accent); font-weight: 600; }
+  nav button .ico { font-size: 16px; width: 20px; text-align: center; }
+  nav .divider { height: 1px; background: var(--border); margin: 8px 4px; }
+
+  /* MAIN */
+  main { flex: 1; padding: 32px; max-width: 900px; }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; }
+  input, select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+  input:focus, select:focus { border-color: var(--accent); }
+  select option { background: var(--surface2); }
+
+  /* RADIO tipo */
+  .radio-group { display: flex; gap: 10px; }
+  .radio-btn {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--muted);
+    text-align: center;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .radio-btn.selected { border-color: var(--accent); color: var(--accent); background: #2a2510; }
+
+  /* BUTTONS */
+  .btn {
+    background: var(--accent);
+    color: #0f0f0f;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn:hover { background: var(--accent2); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
+  .btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid #3a2020;
+    border-radius: 7px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-danger:hover { background: #2a1515; border-color: var(--danger); }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 12px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #1e1e1e; }
+
+  /* BADGES */
+  .badge-eco {
+    font-size: 11px;
+    background: #152015;
+    color: var(--success);
+    border: 1px solid #1e3a1e;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .badge-exec {
+    font-size: 11px;
+    background: #1a1228;
+    color: #a78bfa;
+    border: 1px solid #2a1d40;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* TOAST */
+  #toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 14px 20px;
+    font-size: 14px;
+    max-width: 340px;
+    z-index: 999;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: all 0.25s;
+    pointer-events: none;
+  }
+  #toast.show { opacity: 1; transform: translateY(0); }
+  #toast.success { border-color: var(--success); color: var(--success); }
+  #toast.error { border-color: var(--danger); color: var(--danger); }
+
+  /* EMPTY STATE */
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .empty .ico { font-size: 36px; margin-bottom: 10px; }
+
+  /* CONTRATO CARD */
+  .contrato-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+  .contrato-card .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .contrato-card .header h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
+  .contrato-card .valor { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--accent); }
+  .contrato-card .meta { display: flex; gap: 20px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+  .contrato-card .meta span b { color: var(--text); }
+
+  /* STATS */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .stat-card .num { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--accent); }
+  .stat-card .lbl { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 600; letter-spacing: 0.5px; }
+
+  /* EXTRAS QUE APARECEM/SOMEM */
+  .hidden { display: none !important; }
+  .form-row { margin-top: 18px; display: flex; gap: 10px; align-items: center; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Locadora<span>Central</span></div>
+  <div class="badge">Sistema de Gestão</div>
+</header>
+
+<div class="app">
+  <nav>
+    <div class="section-label">Menu</div>
+    <button class="active" onclick="goTo('dashboard')"><span class="ico">🏠</span> Dashboard</button>
+    <div class="divider"></div>
+    <div class="section-label">Categorias</div>
+    <button onclick="goTo('cat-cadastrar')"><span class="ico">➕</span> Cadastrar</button>
+    <button onclick="goTo('cat-listar')"><span class="ico">📋</span> Listar</button>
+    <div class="divider"></div>
+    <div class="section-label">Veículos</div>
+    <button onclick="goTo('vei-cadastrar')"><span class="ico">🚗</span> Cadastrar</button>
+    <button onclick="goTo('vei-listar')"><span class="ico">📋</span> Listar</button>
+    <div class="divider"></div>
+    <div class="section-label">Locações</div>
+    <button onclick="goTo('loc-realizar')"><span class="ico">🔑</span> Realizar Locação</button>
+    <button onclick="goTo('loc-contratos')"><span class="ico">📄</span> Contratos</button>
+  </nav>
+
+  <main>
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <h1>Dashboard</h1>
+      <p class="subtitle">Visão geral do sistema</p>
+      <div class="stats">
+        <div class="stat-card"><div class="num" id="stat-cats">0</div><div class="lbl">Categorias</div></div>
+        <div class="stat-card"><div class="num" id="stat-veis">0</div><div class="lbl">Veículos</div></div>
+        <div class="stat-card"><div class="num" id="stat-cons">0</div><div class="lbl">Contratos</div></div>
+      </div>
+      <div class="card">
+        <h2>🕒 Últimos contratos</h2>
+        <div id="dash-contratos"></div>
+      </div>
+    </div>
+
+    <!-- CAT CADASTRAR -->
+    <div id="page-cat-cadastrar" class="page">
+      <h1>Cadastrar Categoria</h1>
+      <p class="subtitle">Defina o tipo e o valor da diária</p>
+      <div class="card">
+        <h2>📦 Nova Categoria</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nome da Categoria</label>
+            <input type="text" id="cat-nome" placeholder="Ex: Econômico Plus">
+          </div>
+          <div class="form-group">
+            <label>Valor da Diária (R$)</label>
+            <input type="number" id="cat-diaria" placeholder="150.00" step="0.01" min="0">
+          </div>
+          <div class="form-group full">
+            <label>Tipo</label>
+            <div class="radio-group">
+              <div class="radio-btn selected" id="rb-eco" onclick="selectTipo('eco')">🌱 Econômica</div>
+              <div class="radio-btn" id="rb-exec" onclick="selectTipo('exec')">💎 Executiva</div>
+            </div>
+          </div>
+          <div class="form-group" id="cat-franquia-group">
+            <label>Franquia KM/dia</label>
+            <input type="number" id="cat-franquia" placeholder="100" min="0">
+          </div>
+          <div class="form-group hidden" id="cat-seguro-group">
+            <label>Seguro Incluso</label>
+            <div class="radio-group">
+              <div class="radio-btn selected" id="rb-seg-sim" onclick="selectSeguro(true)">✅ Sim</div>
+              <div class="radio-btn" id="rb-seg-nao" onclick="selectSeguro(false)">❌ Não</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <button class="btn" onclick="cadastrarCategoria()">Cadastrar Categoria</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAT LISTAR -->
+    <div id="page-cat-listar" class="page">
+      <h1>Categorias</h1>
+      <p class="subtitle">Todas as categorias cadastradas</p>
+      <div class="card">
+        <h2>📦 Categorias</h2>
+        <div class="table-wrap">
+          <table id="cat-table">
+            <thead>
+              <tr>
+                <th>ID</th><th>Nome</th><th>Tipo</th><th>Diária</th><th>Detalhes</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="cat-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VEI CADASTRAR -->
+    <div id="page-vei-cadastrar" class="page">
+      <h1>Cadastrar Veículo</h1>
+      <p class="subtitle">Adicione um veículo à frota</p>
+      <div class="card">
+        <h2>🚗 Novo Veículo</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Modelo</label>
+            <input type="text" id="vei-modelo" placeholder="Ex: Honda Civic">
+          </div>
+          <div class="form-group">
+            <label>Placa</label>
+            <input type="text" id="vei-placa" placeholder="Ex: ABC-1234" style="text-transform:uppercase">
+          </div>
+          <div class="form-group full">
+            <label>Categoria</label>
+            <select id="vei-cat"></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <button class="btn" onclick="cadastrarVeiculo()">Cadastrar Veículo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VEI LISTAR -->
+    <div id="page-vei-listar" class="page">
+      <h1>Veículos</h1>
+      <p class="subtitle">Todos os veículos da frota</p>
+      <div class="card">
+        <h2>🚗 Frota</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Modelo</th><th>Placa</th><th>Categoria</th><th></th></tr></thead>
+            <tbody id="vei-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOC REALIZAR -->
+    <div id="page-loc-realizar" class="page">
+      <h1>Realizar Locação</h1>
+      <p class="subtitle">Registre uma nova locação de veículo</p>
+      <div class="card">
+        <h2>🔑 Nova Locação</h2>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Veículo</label>
+            <select id="loc-vei"></select>
+          </div>
+          <div class="form-group">
+            <label>Dias de Locação</label>
+            <input type="number" id="loc-dias" placeholder="5" min="1">
+          </div>
+          <div class="form-group">
+            <label>KM Rodados</label>
+            <input type="number" id="loc-km" placeholder="300" min="0">
+          </div>
+        </div>
+        <div id="loc-preview" class="hidden" style="margin-top:18px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:16px;">
+          <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.8px; color:var(--muted); margin-bottom:8px; font-weight:600;">Prévia do Valor</div>
+          <div id="loc-preview-valor" style="font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--accent);"></div>
+          <div id="loc-preview-detalhe" style="font-size:13px; color:var(--muted); margin-top:6px;"></div>
+        </div>
+        <div class="form-row">
+          <button class="btn-ghost" onclick="calcularPrevia()">Calcular Prévia</button>
+          <button class="btn" onclick="realizarLocacao()">Confirmar Locação</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTRATOS -->
+    <div id="page-loc-contratos" class="page">
+      <h1>Contratos</h1>
+      <p class="subtitle">Histórico de todas as locações realizadas</p>
+      <div id="contratos-list"></div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ===================== STATE =====================
+let db = {
+  categorias: [],
+  veiculos: [],
+  contratos: [],
+  nextCatId: 1,
+  nextVeiId: 1,
+  nextConId: 1,
+};
+
+let catTipo = 'eco';
+let seguroSim = true;
+let currentPage = 'dashboard';
+
+function load() {
+  const saved = localStorage.getItem('locadora_db');
+  if (saved) db = JSON.parse(saved);
+}
+function save() {
+  localStorage.setItem('locadora_db', JSON.stringify(db));
+}
+
+// ===================== NAVIGATION =====================
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  currentPage = page;
+  document.querySelectorAll('nav button').forEach(b => {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${page}'`)) {
+      b.classList.add('active');
+    }
+  });
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'cat-listar') renderCategorias();
+  if (page === 'vei-listar') renderVeiculos();
+  if (page === 'vei-cadastrar') renderCatSelect('vei-cat');
+  if (page === 'loc-realizar') renderCatSelect('loc-vei', true);
+  if (page === 'loc-contratos') renderContratos();
+}
+
+// ===================== TOAST =====================
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show ' + type;
+  setTimeout(() => el.className = '', 3000);
+}
+
+// ===================== CATEGORIA =====================
+function selectTipo(tipo) {
+  catTipo = tipo;
+  document.getElementById('rb-eco').classList.toggle('selected', tipo === 'eco');
+  document.getElementById('rb-exec').classList.toggle('selected', tipo === 'exec');
+  document.getElementById('cat-franquia-group').classList.toggle('hidden', tipo !== 'eco');
+  document.getElementById('cat-seguro-group').classList.toggle('hidden', tipo !== 'exec');
+}
+function selectSeguro(sim) {
+  seguroSim = sim;
+  document.getElementById('rb-seg-sim').classList.toggle('selected', sim);
+  document.getElementById('rb-seg-nao').classList.toggle('selected', !sim);
+}
+
+function cadastrarCategoria() {
+  const nome = document.getElementById('cat-nome').value.trim();
+  const diaria = parseFloat(document.getElementById('cat-diaria').value);
+  if (!nome) return toast('Informe o nome da categoria.', 'error');
+  if (isNaN(diaria) || diaria <= 0) return toast('Informe um valor de diária válido.', 'error');
+
+  const cat = { id: db.nextCatId++, nome, diaria, tipo: catTipo };
+  if (catTipo === 'eco') {
+    const fr = parseInt(document.getElementById('cat-franquia').value) || 100;
+    cat.franquia_km_diaria = fr;
+  } else {
+    cat.seguro_incluso = seguroSim;
+  }
+  db.categorias.push(cat);
+  save();
+  toast(`Categoria "${nome}" cadastrada com ID ${cat.id}.`);
+  document.getElementById('cat-nome').value = '';
+  document.getElementById('cat-diaria').value = '';
+  document.getElementById('cat-franquia').value = '';
+}
+
+function excluirCategoria(id) {
+  const usada = db.veiculos.some(v => v.categoria_id === id);
+  if (usada) return toast('Não é possível remover uma categoria associada a veículos ativos.', 'error');
+  db.categorias = db.categorias.filter(c => c.id !== id);
+  save();
+  toast('Categoria removida.');
+  renderCategorias();
+}
+
+function renderCategorias() {
+  const tbody = document.getElementById('cat-tbody');
+  if (!db.categorias.length) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty"><div class="ico">📦</div>Nenhuma categoria cadastrada</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = db.categorias.map(c => `
+    <tr>
+      <td>${c.id}</td>
+      <td>${c.nome}</td>
+      <td>${c.tipo === 'eco' ? '<span class="badge-eco">Econômica</span>' : '<span class="badge-exec">Executiva</span>'}</td>
+      <td>R$ ${c.diaria.toFixed(2)}</td>
+      <td>${c.tipo === 'eco' ? `Franquia: ${c.franquia_km_diaria} km/dia` : `Seguro: ${c.seguro_incluso ? 'Incluso' : 'Não incluso'}`}</td>
+      <td><button class="btn-danger" onclick="excluirCategoria(${c.id})">Excluir</button></td>
+    </tr>`).join('');
+}
+
+// ===================== VEÍCULO =====================
+function renderCatSelect(elId, isVeiculo = false) {
+  const el = document.getElementById(elId);
+  if (!isVeiculo) {
+    el.innerHTML = db.categorias.length
+      ? db.categorias.map(c => `<option value="${c.id}">[${c.id}] ${c.nome} (${c.tipo === 'eco' ? 'Econômica' : 'Executiva'})</option>`).join('')
+      : '<option value="">Nenhuma categoria cadastrada</option>';
+  } else {
+    el.innerHTML = db.veiculos.length
+      ? db.veiculos.map(v => {
+          const cat = db.categorias.find(c => c.id === v.categoria_id);
+          return `<option value="${v.id}">[${v.id}] ${v.modelo} — ${v.placa} (${cat ? cat.nome : 'sem cat.'})</option>`;
+        }).join('')
+      : '<option value="">Nenhum veículo cadastrado</option>';
+  }
+}
+
+function cadastrarVeiculo() {
+  const modelo = document.getElementById('vei-modelo').value.trim();
+  const placa = document.getElementById('vei-placa').value.trim().toUpperCase();
+  const catId = parseInt(document.getElementById('vei-cat').value);
+  if (!modelo) return toast('Informe o modelo do veículo.', 'error');
+  if (!placa) return toast('Informe a placa do veículo.', 'error');
+  if (!catId) return toast('Selecione uma categoria.', 'error');
+  if (db.veiculos.some(v => v.placa === placa)) return toast('Já existe um veículo com esta placa.', 'error');
+  const cat = db.categorias.find(c => c.id === catId);
+  if (!cat) return toast('Categoria não encontrada.', 'error');
+  const v = { id: db.nextVeiId++, modelo, placa, categoria_id: catId };
+  db.veiculos.push(v);
+  save();
+  toast(`Veículo "${modelo}" cadastrado com ID ${v.id}.`);
+  document.getElementById('vei-modelo').value = '';
+  document.getElementById('vei-placa').value = '';
+}
+
+function excluirVeiculo(id) {
+  if (db.contratos.some(c => c.veiculo_id === id))
+    return toast('Não é possível remover um veículo com histórico de contratos.', 'error');
+  db.veiculos = db.veiculos.filter(v => v.id !== id);
+  save();
+  toast('Veículo removido.');
+  renderVeiculos();
+}
+
+function renderVeiculos() {
+  const tbody = document.getElementById('vei-tbody');
+  if (!db.veiculos.length) {
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty"><div class="ico">🚗</div>Nenhum veículo cadastrado</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = db.veiculos.map(v => {
+    const cat = db.categorias.find(c => c.id === v.categoria_id);
+    return `<tr>
+      <td>${v.id}</td>
+      <td>${v.modelo}</td>
+      <td>${v.placa}</td>
+      <td>${cat ? (cat.tipo === 'eco' ? `<span class="badge-eco">${cat.nome}</span>` : `<span class="badge-exec">${cat.nome}</span>`) : '—'}</td>
+      <td><button class="btn-danger" onclick="excluirVeiculo(${v.id})">Excluir</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ===================== NEGÓCIO: CÁLCULO =====================
+function calcularValor(cat, dias, km) {
+  if (cat.tipo === 'eco') {
+    const base = cat.diaria * dias;
+    const franquiaTotal = cat.franquia_km_diaria * dias;
+    const excedente = Math.max(0, km - franquiaTotal);
+    return +(base + excedente * 0.50).toFixed(2);
+  } else {
+    let base = cat.diaria * dias;
+    if (dias > 7) base *= 0.90;
+    return +base.toFixed(2);
+  }
+}
+
+function calcularPrevia() {
+  const veiId = parseInt(document.getElementById('loc-vei').value);
+  const dias = parseInt(document.getElementById('loc-dias').value);
+  const km = parseInt(document.getElementById('loc-km').value);
+  if (!veiId) return toast('Selecione um veículo.', 'error');
+  if (!dias || dias <= 0) return toast('Informe os dias de locação.', 'error');
+  if (isNaN(km) || km < 0) return toast('Informe os KM rodados.', 'error');
+  const vei = db.veiculos.find(v => v.id === veiId);
+  const cat = db.categorias.find(c => c.id === vei.categoria_id);
+  const valor = calcularValor(cat, dias, km);
+  document.getElementById('loc-preview').classList.remove('hidden');
+  document.getElementById('loc-preview-valor').textContent = `R$ ${valor.toFixed(2)}`;
+  let detalhe = '';
+  if (cat.tipo === 'eco') {
+    const franquiaTotal = cat.franquia_km_diaria * dias;
+    const excedente = Math.max(0, km - franquiaTotal);
+    detalhe = `Base: R$ ${(cat.diaria * dias).toFixed(2)} | Franquia: ${franquiaTotal} km | Excedente: ${excedente} km × R$ 0,50`;
+  } else {
+    detalhe = `Base: R$ ${(cat.diaria * dias).toFixed(2)}${dias > 7 ? ' com 10% de desconto (>7 dias)' : ''}`;
+  }
+  document.getElementById('loc-preview-detalhe').textContent = detalhe;
+}
+
+function realizarLocacao() {
+  const veiId = parseInt(document.getElementById('loc-vei').value);
+  const dias = parseInt(document.getElementById('loc-dias').value);
+  const km = parseInt(document.getElementById('loc-km').value);
+  if (!veiId) return toast('Selecione um veículo.', 'error');
+  if (!dias || dias <= 0) return toast('A duração da locação deve ser maior que zero.', 'error');
+  if (isNaN(km) || km < 0) return toast('Informe os KM rodados.', 'error');
+  const vei = db.veiculos.find(v => v.id === veiId);
+  if (!vei) return toast('Veículo não encontrado.', 'error');
+  const cat = db.categorias.find(c => c.id === vei.categoria_id);
+  if (!cat) return toast('Veículo sem categoria associada.', 'error');
+  const valor = calcularValor(cat, dias, km);
+  const today = new Date().toISOString().split('T')[0];
+  const contrato = { id: db.nextConId++, veiculo_id: veiId, dias, km_rodados: km, valor_total: valor, data: today };
+  db.contratos.push(contrato);
+  save();
+  toast(`Contrato #${contrato.id} criado! Valor: R$ ${valor.toFixed(2)}`);
+  document.getElementById('loc-vei').value = '';
+  document.getElementById('loc-dias').value = '';
+  document.getElementById('loc-km').value = '';
+  document.getElementById('loc-preview').classList.add('hidden');
+}
+
+// ===================== CONTRATOS =====================
+function renderContratos() {
+  const el = document.getElementById('contratos-list');
+  if (!db.contratos.length) {
+    el.innerHTML = '<div class="empty"><div class="ico">📄</div>Nenhum contrato registrado</div>';
+    return;
+  }
+  el.innerHTML = [...db.contratos].reverse().map(c => {
+    const vei = db.veiculos.find(v => v.id === c.veiculo_id);
+    const cat = vei ? db.categorias.find(ct => ct.id === vei.categoria_id) : null;
+    return `<div class="contrato-card">
+      <div class="header">
+        <h3>Contrato #${c.id}</h3>
+        <div class="valor">R$ ${c.valor_total.toFixed(2)}</div>
+      </div>
+      <div class="meta">
+        <span><b>Data:</b> ${c.data}</span>
+        <span><b>Veículo:</b> ${vei ? `${vei.modelo} (${vei.placa})` : `ID ${c.veiculo_id}`}</span>
+        <span><b>Categoria:</b> ${cat ? cat.nome : '—'}</span>
+        <span><b>Dias:</b> ${c.dias}</span>
+        <span><b>KM:</b> ${c.km_rodados}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===================== DASHBOARD =====================
+function renderDashboard() {
+  document.getElementById('stat-cats').textContent = db.categorias.length;
+  document.getElementById('stat-veis').textContent = db.veiculos.length;
+  document.getElementById('stat-cons').textContent = db.contratos.length;
+  const el = document.getElementById('dash-contratos');
+  const ultimos = [...db.contratos].reverse().slice(0, 3);
+  if (!ultimos.length) {
+    el.innerHTML = '<div class="empty"><div class="ico">📄</div>Nenhum contrato ainda</div>';
+    return;
+  }
+  el.innerHTML = ultimos.map(c => {
+    const vei = db.veiculos.find(v => v.id === c.veiculo_id);
+    const cat = vei ? db.categorias.find(ct => ct.id === vei.categoria_id) : null;
+    return `<div class="contrato-card">
+      <div class="header"><h3>Contrato #${c.id}</h3><div class="valor">R$ ${c.valor_total.toFixed(2)}</div></div>
+      <div class="meta">
+        <span><b>Data:</b> ${c.data}</span>
+        <span><b>Veículo:</b> ${vei ? vei.modelo : '—'}</span>
+        <span><b>Categoria:</b> ${cat ? cat.nome : '—'}</span>
+        <span><b>Dias:</b> ${c.dias}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===================== INIT =====================
+load();
+renderDashboard();
+</script>
+</body>
+</html>
